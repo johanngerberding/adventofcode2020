@@ -1,6 +1,5 @@
 /advent_cpp/*.dSYM
 /.vscode
 /.dist
-/advent_cpp/day01
-/advent_cpp/day02
-/advent_cpp/day03
+
+/advent_cpp/out/
