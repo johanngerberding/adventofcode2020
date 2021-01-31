@@ -61,6 +61,31 @@ int check_passwords(std::vector<std::string> passwords)
     return valid;
 }
 
+int check_passwords_2(std::vector<std::string> passwords) 
+{
+    int valid = 0;
+    for (std::string pwd : passwords) 
+    {
+        // remove newline from the end of the pwd
+        pwd.erase(std::remove(pwd.begin(), pwd.end(), '\n'), pwd.end());
+        std::size_t p = pwd.find(" ");
+        // extract min and max number for character
+        std::string min_max = pwd.substr(0, p);
+        std::size_t pos_1 = std::stoi(min_max.substr(0, min_max.find("-")));
+        std::size_t pos_2 = std::stoi(min_max.substr((min_max.find("-")+1)));
+
+        // extract the character and the password
+        pwd = pwd.substr((p+1));
+        char character = pwd.substr(0, pwd.find(":"))[0];
+        std::string password = pwd.substr((pwd.find(" ") + 1));
+
+        if ((password[(pos_1 - 1)] == character) != (password[(pos_2 - 1)] == character)) 
+            valid++; 
+
+    }
+    return valid;
+}
+
 int main() 
 {   
     std::string fileName {"../inputs/day02.txt"};
@@ -72,6 +97,9 @@ int main()
 
     assert((check_passwords(passwords) == 465));
     std::cout << "Second test passed!" << std::endl;
+
+    assert((check_passwords_2(passwords) == 294));
+    std::cout << "Third test passed!" << std::endl;
     
     return 0;
 }
