@@ -58,3 +58,12 @@ with open("../inputs/day05.txt") as f:
             max_ID = get_ID(boarding_pass)
     
     print(max_ID)
+    seat_ids = [get_ID(bp) for bp in data]
+    min_id = min(seat_ids)
+    max_id = max(seat_ids)
+    
+    my_id = [x for x in range(min_id, max_id) 
+             if x not in seat_ids and x-1 in seat_ids and x+1 in seat_ids]
+    
+    print(my_id[0])
+    
