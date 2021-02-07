@@ -1,3 +1,6 @@
+from __future__ import annotations
+from typing import NamedTuple, List
+
 TEST = """nop +0
 acc +1
 jmp +4
@@ -10,37 +13,80 @@ acc +6
 """
 
 
-def read_instructions(raw: str) -> dict:
-    instructions = {}
-    r_instructions = raw.splitlines()
-    for i, instruction in enumerate(r_instructions):
-        code, val = instruction.split(" ")
-        instructions[i] = [code, int(val), 0]
-        
-    return instructions
+class Instruction(NamedTuple):
+    op: str
+    arg: int 
+
+    @staticmethod
+    def parse(line: str) -> Instruction:
+        op, arg = line.strip().split()
+        return Instruction(op, int(arg))
 
 
-def loop_instructions(inst: dict) -> int:
-    instructions = inst
-    acc = 0
-    pos = 0
-    while True:
-        if instructions[pos][2] != 0:
-            return acc
+class Booter:
+    def __init__(self, instructions: List[Instruction]) -> None:
+        self.instructions = instructions
+        self.accumulator = 0
+        self.idx = 0
+
+    
+    def execute_one(self) -> None:
+        op, arg = self.instructions[self.idx]
+
+        if op == 'acc':
+            self.accumulator += arg
+            self.idx += 1
+        elif op == 'jmp':
+            self.idx += arg 
+        elif op == 'nop':
+            self.idx += 1
         else:
-            instructions[pos][2] += 1
-            if instructions[pos][0] == 'nop':
-                pos += 1
-            elif instructions[pos][0] == 'acc':
-                acc += instructions[pos][1]
-                pos += 1
-            elif instructions[pos][0] == 'jmp':
-                pos += instructions[pos][1]
+            raise ValueError(f"unknown operation: {op}")
+    
+    def run_until_repeat(self) -> None:
+        executed = set()
+        while self.idx not in executed:
+            executed.add(self.idx)
+            self.execute_one()
 
 
-assert loop_instructions(read_instructions(TEST)) == 5
+    def does_terminate(self) -> bool:
+        executed = set()
+        while self.idx not in executed:
+            if self.idx == len(self.instructions):
+                return True
+            
+            executed.add(self.idx)
+            self.execute_one()
+        
+        return False
+
+
+def find_terminator(instructions: List[Instruction]) -> int:
+    for i ,(op, arg) in enumerate(instructions):
+        subbed = instructions[:]
+
+        if op == 'nop':
+            subbed[i] = Instruction('jmp', arg)
+        elif op == 'jmp':
+            subbed[i] = Instruction('nop', arg)
+        else:
+            continue
+        
+        booter = Booter(subbed)
+
+        if booter.does_terminate():
+            return booter.accumulator
+        
+    raise RuntimeError("doesn't terminate")
+
+
 
 with open('../inputs/day08.txt', 'r') as f:
-    data = f.read()
-    instructions = read_instructions(data)
-    print(loop_instructions(instructions))
+    raw = f.read() 
+    instructions = [Instruction.parse(line) for line in raw.split("\n")]
+    booter = Booter(instructions)
+    booter.run_until_repeat()
+    print(booter.accumulator)
+    print(find_terminator(instructions))
+    
