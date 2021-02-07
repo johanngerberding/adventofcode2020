@@ -1,6 +1,4 @@
-/advent_cpp/*.dSYM
 /.vscode
 /.dist
 
 /advent_cpp
-/advent_cpp/*
