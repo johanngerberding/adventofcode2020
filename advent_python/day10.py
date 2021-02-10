@@ -70,26 +70,42 @@ def validate(data: list) -> bool:
     return True
 
 
-def min_number_elements(raw: str) -> int:
+def min_number_elements(raw: str) -> list:
     data = read_input(raw)
-    return 0
+    data_ = [0]
+    i = 0
+    while data[i] != max(data):
+        min_val = data[i] 
+        max_val = data[i] + 3
+        vals_in_range = [val for val in data if val > min_val and val <= max_val]
+        next_val = max(vals_in_range)
+        data_.append(next_val)
+        i = data.index(next_val)
+    
+    assert validate(data_)
+
+    return data_
 
 
-min_number_elements(TEST)
-
-"""
 def count_arrangements(raw: str) -> int:
-    data_ = read_input(raw)
     data = read_input(raw)
-    count = 0   
-    while validate(data):
-        for i in range(len(data)):
-            data_ = 
-        
-        count += 1
-        
+    possible_ways = [0 for _ in range(data[-1]+1)]
+    out = data[-1]
+    possible_ways[0] = 1
+    if 1 in data:
+        possible_ways[1] = 1
 
-    return 0"""
+    if 1 in data and 2 in data:
+        possible_ways[2] = 2
+    elif 2 in data:
+        possible_ways[2] = 1
+    
+    for i in range(3, out+1):
+        if i not in data:
+            continue
+        possible_ways[i] = possible_ways[i-3] + possible_ways[i-2] + possible_ways[i-1]
+    
+    return possible_ways[out]
 
 
 def jolt_count(raw: str) -> int:
@@ -116,4 +132,7 @@ def jolt_count(raw: str) -> int:
 
 
 with open("../inputs/day10.txt") as f: 
-    print(jolt_count(f.read()))
+    #print(jolt_count(f.read()))
+    print(count_arrangements(f.read()))
+    print(count_arrangements(TEST))
+    print(count_arrangements(TEST_2))
